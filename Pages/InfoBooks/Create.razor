@@ -1,0 +1,57 @@
+﻿@page "/addinfo"
+@using lab7.Shared.Models
+@inject HttpClient httpClient
+
+<h1>Add new information about book</h1>
+
+<EditForm Model="_infoBook" OnValidSubmit="AddInfo" >	
+	<label id="book">Book</label>
+	<InputSelect @bind-Value="_infoBook.BookID" id="book" >
+		<option value="%">Choose book</option>
+		@foreach(var book in _books)
+		{
+			<option value="@book.ID">@book.Name</option>
+		}
+	</InputSelect>
+	<br/>
+	<label for="ticket">Ticket</label>
+	<InputSelect @bind-Value="_infoBook.TicketID" id="ticket" >
+		<option value="%">Choose ticket</option>
+		@foreach(var ticket in _tickets)
+		{
+			<option value="@ticket.ID">@ticket.ID</option>
+		}
+	</InputSelect>
+	<br/>
+	<label>Date take book</label>
+	<InputDate @bind-Value="_infoBook.DateTakeBook" />
+	<br/>
+	<label>Date return book</label>
+	<InputDate @bind-Value="_infoBook.DateReturnBook" />
+	<br/>
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<button type="submit">Add new information about book</button>
+	<button><a href="/infobooks">View all information about books</a></button>
+</EditForm>
+
+@code {
+	[Inject] NavigationManager navigationManager { get; set; } = null!;
+
+	private InfoBook _infoBook = new InfoBook();
+	private List<Ticket> _tickets = new List<Ticket>();
+	private List<Book> _books = new List<Book>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		_tickets = await httpClient.GetFromJsonAsync<List<Ticket>>("api/Ticket/GetTickets");
+		_books = await httpClient.GetFromJsonAsync<List<Book>>("api/Book/GetBooks");
+	}
+
+	private async Task AddInfo()
+	{
+		await httpClient.PostAsJsonAsync<InfoBook>("api/InfoBook/AddInfoBook", _infoBook);
+		navigationManager.NavigateTo("/infobooks");
+	} 
+
+}

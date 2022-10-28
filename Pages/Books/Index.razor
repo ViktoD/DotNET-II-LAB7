@@ -1,0 +1,72 @@
+﻿@page "/books"
+@using lab7.Shared.Models
+@inject HttpClient httpClient
+
+<h1>All books</h1>
+<a href="/editbook/0" class="btn btn-primary">Add new book</a>
+<table class="table table-bordered table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Author
+            </th>
+            <th>
+                Price
+            </th>
+            <th>
+                Year published
+            </th>
+            <th>
+
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var book in books)
+        {
+            <tr>
+                <td>
+                    @book.ID
+                </td>
+                <td>
+                    @book.Name
+                </td>
+                <td>
+                    @book.Author
+                </td>
+                <td>
+                    @book.Price
+                </td>
+                <td>
+                    @book.YearPublished
+                </td>
+                <td>
+                    <a href="/editbook/@book.ID" class="btn btn-warning">Edit book</a>
+                </td>
+                <td>
+                    <a href="/deletebook/@book.ID" asp-route-id="@book.ID" class="btn btn-danger">Delete book</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Book> books = new List<Book>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		books = await httpClient.GetFromJsonAsync<List<Book>>("api/Book/GetBooks");
+	}
+}
+
+

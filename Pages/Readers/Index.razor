@@ -1,0 +1,81 @@
+﻿@page "/readers"
+@using lab7.Shared.Models
+@inject HttpClient httpClient
+
+<h1>All readers</h1>
+<a href="/editreader/0" class="btn btn-primary">Add new reader</a>
+<table class="table table-bordered table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                Surname
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Patronymic name
+            </th>
+            <th>
+                Address
+            </th>
+            <th>
+                Phone
+            </th>
+            <th>
+                Date birth
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var reader in readers)
+        {
+            <tr>
+                <td>
+                    @reader.ID
+                </td>
+                <td>
+                    @reader.Surname
+                </td>
+                <td>
+                    @reader.Name
+                </td>
+                <td>
+                    @reader.PatronymicName
+                </td>
+                <td>
+                    @reader.Address
+                </td>
+                <td>
+                    @reader.Phone
+                </td>
+                <td>
+                    @reader.DateBirth.ToString("d")
+                </td>
+                <td>
+                    <a href="/editreader/@reader.ID" class="btn btn-warning">Edit reader</a>
+                </td>
+                <td>
+                    <a href="/deletereader/@reader.ID" class="btn btn-danger">Delete reader</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@code {
+    List<Reader> readers = new List<Reader>();
+   
+
+	protected override async Task OnInitializedAsync()
+	{
+		readers = await httpClient.GetFromJsonAsync<List<Reader>>("api/Reader/GetReaders");
+
+	}
+}

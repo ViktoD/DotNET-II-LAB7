@@ -1,0 +1,68 @@
+﻿@page "/editbook/{id:int}"
+@using lab7.Shared.Models
+@inject HttpClient httpClient
+
+@{
+	if(id == 0)
+	{
+		<h1>Add book</h1>
+	}
+	else
+	{
+		<h1>Edit book</h1>
+	}
+}
+
+<EditForm Model="_book" OnValidSubmit="EditBook">
+	<label for="name">Name book</label>
+	<InputText @bind-Value="_book.Name" id="name" />
+	<br/>
+	<label for="author">Author</label>
+	<InputText @bind-Value="_book.Author" id="author" />
+	<br/>
+	<label>Price book</label>
+	<InputNumber @bind-Value="_book.Price"  />
+	<br/>
+	<label>Year published</label>
+	<InputNumber @bind-Value="_book.YearPublished"  />
+	<br/>
+
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	<button type="submit">Save chnages</button>
+	<button><a href="/books">Return to all books</a></button>
+
+</EditForm>
+
+@code {
+	[Inject] NavigationManager navigationManager{ get; set; } = null!;
+	[Parameter] public int id { get; set; }
+	private Book _book = new Book();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if(id < 0)
+		{
+			navigationManager.NavigateTo("/books");
+		}
+
+		if (id != 0)
+		{
+			_book = await httpClient.GetFromJsonAsync<Book>($"api/Book/{id}");
+		}
+	}
+
+	private async Task EditBook()
+	{
+		if (id == 0)
+		{
+			await httpClient.PostAsJsonAsync<Book>("api/Book/AddBook", _book);
+		}
+		else
+		{
+			await httpClient.PostAsJsonAsync<Book>("api/Book/EditBook", _book);
+		}
+		navigationManager.NavigateTo("/books");
+	}
+}

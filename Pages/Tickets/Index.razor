@@ -1,0 +1,72 @@
+﻿@page "/tickets"
+@using lab7.Shared.Models
+@inject HttpClient httpClient
+
+<h1>All tickets</h1>
+
+<a href="/addticket" class="btn btn-primary">Add new ticket</a>
+<table class="table table-bordered table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>
+                ID ticket
+            </th>
+            <th>
+                Surname reader
+            </th>
+            <th>
+                Name reader
+            </th>
+            <th>
+                Patronymic name reader
+            </th>
+            <th>
+                Date start
+            </th>
+            <th>
+                Date end
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var ticket in tickets)
+        {
+            <tr>
+                <td>
+                    @ticket.ID
+                </td>
+                <td>
+                    @ticket.Reader.Surname
+                </td>
+                <td>
+                    @ticket.Reader.Name
+                </td>
+                <td>
+                    @ticket.Reader.PatronymicName
+                </td>
+                <td>
+                    @ticket.DateStart.ToString("d")
+                </td>
+                <td>
+                    @ticket.DateEnd.ToString("d")
+                </td>
+                <td>
+                    <a href="/deleteticket/@ticket.ID" class="btn btn-danger">Delete information</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+	List<Ticket> tickets = new List<Ticket>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		tickets = await httpClient.GetFromJsonAsync<List<Ticket>>("api/Ticket/GetTickets");
+	}
+}

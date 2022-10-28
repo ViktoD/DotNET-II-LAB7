@@ -1,0 +1,49 @@
+﻿@page "/addticket"
+@using lab7.Shared.Models
+@inject HttpClient httpClient
+
+<h1>Add new ticket</h1>
+
+<EditForm Model="_ticket" OnValidSubmit="AddTicket" >
+	<label for="reader">Choose reader</label>
+	<InputSelect @bind-Value="_ticket.ReaderID" id="reader">
+		<option value="%">Choose reader</option>
+		@foreach(var reader in readers)
+		{
+			<option value="@reader.ID">@reader.Surname</option>
+		}
+	</InputSelect>
+	<br/>
+	<label>Date start</label>
+	<InputDate @bind-Value="_ticket.DateStart" />
+	<br/>
+	<label>Date end</label>
+	<InputDate @bind-Value="_ticket.DateEnd" />
+	<br/>
+
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	<button type="submit">Create new ticket</button>
+	<button><a href="/tickets">Return to all tickets</a></button>
+
+</EditForm>
+
+@code {
+	[Inject] NavigationManager navigationManager{ get; set; } = null!;
+
+	private Ticket _ticket = new Ticket();
+	private List<Reader> readers = new List<Reader>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		readers = await httpClient.GetFromJsonAsync<List<Reader>>("api/Reader/GetReaders");
+	}
+
+	private async Task AddTicket()
+	{
+		await httpClient.PostAsJsonAsync<Ticket>("api/Ticket/AddTicket", _ticket);
+		navigationManager.NavigateTo("/tickets");
+	} 
+}
+

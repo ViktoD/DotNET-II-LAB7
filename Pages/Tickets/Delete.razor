@@ -1,0 +1,42 @@
+﻿@page "/deleteticket/{id:int}"
+@using lab7.Shared.Models
+@inject HttpClient httpClient
+
+<h1>Delete ticket</h1>
+
+<EditForm Model="_ticket" OnSubmit="DeleteTicket">
+	<label>Reader id</label>
+	<input value="@_ticket.ReaderID" readonly />
+	<br/>
+	<label>Date start</label>
+	<input value="@_ticket.DateStart.ToString("d")" readonly />
+	<br/>
+	<label>Date end</label>
+	<input value="@_ticket.DateEnd.ToString("d")" readonly />
+	<br/>
+	<button type="submit">Delete information about ticket</button>
+	<button><a href="/tickets">Return to all tickets</a></button>
+</EditForm>
+
+@code {
+	[Inject] NavigationManager navigationManager { get; set; } = null!;
+	[Parameter] public int id{ get; set; }
+
+	private Ticket _ticket = new Ticket();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if(id <= 0)
+		{
+			navigationManager.NavigateTo("/tickets");
+		}
+		_ticket = await httpClient.GetFromJsonAsync<Ticket>($"api/Ticket/{id}"); 
+	}
+
+	private async Task DeleteTicket()
+	{
+		await httpClient.PostAsJsonAsync<Ticket>("api/Ticket/DeleteTicket", _ticket);
+		navigationManager.NavigateTo("/tickets");
+	}
+}
+

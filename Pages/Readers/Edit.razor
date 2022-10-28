@@ -1,0 +1,75 @@
+﻿@page "/editreader/{id:int}"
+@using lab7.Shared.Models
+@inject HttpClient httpClient
+
+@{
+	if(id == 0)
+	{
+		<h1>Add reader</h1>
+	}
+	else
+	{
+		<h1>Edit reader</h1>
+	}
+}
+
+<EditForm Model="_reader" OnValidSubmit="EditReader">
+	
+	<label for="surname">Surname</label>
+	<InputText @bind-Value="_reader.Surname" id="surname" />
+	<br/>
+	<label for="name">Name</label>
+	<InputText @bind-Value="_reader.Name" id="name" />
+	<br/>
+	<label for="patronymicname">Patronymic name</label>
+	<InputText @bind-Value="_reader.PatronymicName" id="patronymicname" />
+	<br/>
+	<label for="address">Address</label>
+	<InputText @bind-Value="_reader.Address" id="address" />
+	<br/>
+	<label>Phone</label>
+	<InputNumber @bind-Value="_reader.Phone"  />
+	<br/>
+	<label>Date birth</label>
+	<InputDate @bind-Value="_reader.DateBirth" />
+	<br/>
+
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	<button type="submit">Save chnages</button>
+	<button><a href="/readers">Return to all readers</a></button>
+</EditForm>
+
+@code {
+	[Inject] NavigationManager navigationManager{ get; set; } = null!;
+	private Reader _reader = new Reader();
+	[Parameter] public int id { get; set; }
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (id < 0) 
+		{ 
+			navigationManager.NavigateTo("/readers"); 
+		}
+
+		if(id != 0)
+		{
+			_reader = await httpClient.GetFromJsonAsync<Reader>($"api/Reader/{id}");
+		}
+	}
+
+	private async Task EditReader()
+	{
+		if (id == 0) 
+		{
+			await httpClient.PostAsJsonAsync<Reader>("api/Reader/AddReader",_reader);
+		}
+		else 
+		{
+			await httpClient.PostAsJsonAsync<Reader>("api/Reader/EditReader", _reader);
+		}
+
+		navigationManager.NavigateTo("/readers"); 
+	}
+}

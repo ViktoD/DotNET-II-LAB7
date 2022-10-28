@@ -1,0 +1,52 @@
+﻿@page "/deletereader/{id:int}"
+@using lab7.Shared.Models
+@inject HttpClient httpClient
+
+<h1>Delete reader</h1>
+<EditForm Model="_reader" OnSubmit="DeleteReader">
+	
+	<label>Surname</label>
+	<input value="@_reader.Surname" readonly />
+	<br/>
+	<label>Name</label>
+	<input value="@_reader.Name" readonly />
+	<br/>
+	<label>Patronymic name</label>
+	<input value="@_reader.PatronymicName" readonly />
+	<br/>
+	<label>Address</label>
+	<input value="@_reader.Address" readonly />
+	<br/>
+	<label>Phone</label>
+	<input value="@_reader.Phone" readonly />
+	<br/>
+	<label>Date birth</label>
+	<input value="@_reader.DateBirth" readonly />
+	<br/>
+
+	<button type="submit">Delete reader</button>
+	<button><a href="/readers">Return to all readers</a></button>
+</EditForm>
+
+@code {
+	[Inject] NavigationManager navigationManager{ get; set; } = null!;
+	private Reader _reader = new Reader();
+	[Parameter] public int id { get; set; }
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (id <= 0) 
+		{ 
+			navigationManager.NavigateTo("/readers"); 
+		}
+		_reader = await httpClient.GetFromJsonAsync<Reader>($"api/Reader/{id}");
+	}
+
+	private async Task DeleteReader()
+	{
+		await httpClient.PostAsJsonAsync<Reader>("api/Reader/DeleteReader",_reader);
+		navigationManager.NavigateTo("/readers"); 
+	}
+
+	
+}

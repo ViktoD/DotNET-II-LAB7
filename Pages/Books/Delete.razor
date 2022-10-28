@@ -1,0 +1,44 @@
+﻿@page "/deletebook/{id:int}"
+@using lab7.Shared.Models
+@inject HttpClient httpClient
+
+<h1>Delete book</h1>
+
+<EditForm Model="_book" OnValidSubmit="DeleteBook">
+	<label>Name</label>
+	<input value="@_book.Name" readonly />
+	<br/>
+	<label>Author</label>
+	<input value="@_book.Author" readonly />
+	<br/>
+	<label>Price book</label>
+	<input value="@_book.Price" readonly />
+	<br/>
+	<label>Year published</label>
+	<input value="@_book.YearPublished" readonly />
+	<br/>
+	<button type="submit">Delete book</button>
+	<button><a href="/books">Return to all books</a></button>
+
+</EditForm>
+
+@code {
+	[Inject] NavigationManager navigationManager{ get; set; } = null!;
+	[Parameter] public int id { get; set; }
+	private Book _book = new Book();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if(id <= 0)
+		{
+			navigationManager.NavigateTo("/books");
+		}
+		_book = await httpClient.GetFromJsonAsync<Book>($"api/Book/{id}");
+	}
+
+	private async Task DeleteBook()
+	{
+		await httpClient.PostAsJsonAsync<Book>("api/Book/DeleteBook", _book);
+		navigationManager.NavigateTo("/books");
+	}
+}

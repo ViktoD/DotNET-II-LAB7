@@ -1,0 +1,54 @@
+﻿@page "/deleteinfo/{id:int}"
+@using lab7.Shared.Models
+@inject HttpClient httpClient
+
+
+<h1>Delete information about book</h1>
+<EditForm Model="_infoBook" OnSubmit="DeleteInfoBook" >
+	<label>Book ID</label>
+	<input value="@_infoBook.BookID" readonly />
+	<br/>
+	<label>Ticket ID</label>
+	<input value="@_infoBook.TicketID" readonly />
+	<br/>
+	<label>Date take book</label>
+	<input value="@_infoBook.DateTakeBook.ToString("d")" readonly />
+	<br/>
+	<label>Date return book</label>
+	@{
+		if(_infoBook.DateReturnBook == null)
+		{
+			<input value="Book is not returned" readonly />
+		}
+		else
+		{
+			<input value="@_infoBook.DateReturnBook" readonly />
+		}
+	}
+	<br/>
+	<button type="submit">Delete book</button>
+	<button><a href="/infobooks">Return to all books</a></button>
+</EditForm>
+
+@code {
+	[Inject] NavigationManager navigationManager { get; set; } = null!;
+	[Parameter] public int id{ get; set; }
+
+	private InfoBook _infoBook = new InfoBook();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if(id <= 0)
+		{
+			navigationManager.NavigateTo("/infobooks");
+		}
+		_infoBook = await httpClient.GetFromJsonAsync<InfoBook>($"api/InfoBook/{id}");
+
+	}
+
+	private async Task DeleteInfoBook()
+	{
+		await httpClient.PostAsJsonAsync<InfoBook>("api/InfoBook/DeleteInfoBook", _infoBook);
+		navigationManager.NavigateTo("/infobooks");
+	}
+}
