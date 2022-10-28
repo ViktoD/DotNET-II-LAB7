@@ -26,6 +26,7 @@ namespace lab7.Server.Controllers
         
 
         [HttpGet("{id:int}")]
+        [Route("GetTicket/{id:int}")]
         public async Task<ActionResult<Ticket>> GetTicket(int id)
         {
             return await _db.Tickets.FirstAsync(p => p.ID == id);
