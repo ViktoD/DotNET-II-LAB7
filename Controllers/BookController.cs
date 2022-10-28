@@ -25,6 +25,7 @@ namespace lab7.Server.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Route("GetBook/{id:int}")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
             return await _db.Books.FirstAsync(p => p.ID == id);
