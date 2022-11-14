@@ -1,8 +1,12 @@
-﻿@page "/deletereader/{id:int}"
+@page "/deletereader/{id:int}"
 @using lab7.Shared.Models
 @inject HttpClient httpClient
 
 <h1>Delete reader</h1>
+@if(_reader == null){
+	<h1>Reader not found</h1>
+}
+else{
 <EditForm Model="_reader" OnSubmit="DeleteReader">
 	
 	<label>Surname</label>
@@ -21,16 +25,18 @@
 	<input value="@_reader.Phone" readonly />
 	<br/>
 	<label>Date birth</label>
-	<input value="@_reader.DateBirth" readonly />
+	<input value="@_reader.DateBirth.ToString("d")" readonly />
 	<br/>
 
 	<button type="submit">Delete reader</button>
-	<button><a href="/readers">Return to all readers</a></button>
+	
 </EditForm>
+}
+<button><a href="/readers">Return to all readers</a></button>
 
 @code {
 	[Inject] NavigationManager navigationManager{ get; set; } = null!;
-	private Reader _reader = new Reader();
+	private Reader? _reader = new Reader();
 	[Parameter] public int id { get; set; }
 
 	protected override async Task OnParametersSetAsync()
@@ -44,7 +50,10 @@
 
 	private async Task DeleteReader()
 	{
-		await httpClient.PostAsJsonAsync<Reader>("api/Reader/DeleteReader",_reader);
+		if (_reader != null)
+		{
+			await httpClient.DeleteAsync($"api/Reader/{_reader.ID}");
+		}
 		navigationManager.NavigateTo("/readers"); 
 	}
 
