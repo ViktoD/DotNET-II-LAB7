@@ -1,9 +1,9 @@
-﻿@page "/deletebook/{id:int}"
+@page "/deletebook/{id:int}"
 @using lab7.Shared.Models
 @inject HttpClient httpClient
 
 <h1>Delete book</h1>
-
+@if(_book != null){
 <EditForm Model="_book" OnValidSubmit="DeleteBook">
 	<label>Name</label>
 	<input value="@_book.Name" readonly />
@@ -18,14 +18,18 @@
 	<input value="@_book.YearPublished" readonly />
 	<br/>
 	<button type="submit">Delete book</button>
-	<button><a href="/books">Return to all books</a></button>
 
 </EditForm>
+}
+else{
+	<h1>Book not found</h1>
+}
+<button><a href="/books">Return to all books</a></button>
 
 @code {
 	[Inject] NavigationManager navigationManager{ get; set; } = null!;
 	[Parameter] public int id { get; set; }
-	private Book _book = new Book();
+	private Book? _book = new Book();
 
 	protected override async Task OnParametersSetAsync()
 	{
@@ -38,7 +42,10 @@
 
 	private async Task DeleteBook()
 	{
-		await httpClient.PostAsJsonAsync<Book>("api/Book/DeleteBook", _book);
+		if (_book != null)
+		{
+			await httpClient.DeleteAsync($"api/Book/{_book.ID}");
+		}
 		navigationManager.NavigateTo("/books");
 	}
 }
