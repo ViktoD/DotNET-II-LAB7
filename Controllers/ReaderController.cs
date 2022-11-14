@@ -1,4 +1,4 @@
-﻿using lab7.Server.Database;
+using lab7.Server.Database;
 using lab7.Shared.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,44 +18,37 @@ namespace lab7.Server.Controllers
         }
 
         [HttpGet]
-        [Route("GetReaders")]
         public async Task<ActionResult<List<Reader>>> GetReaders()
         {
             return await _db.Readers.OrderBy(p => p.Surname).ToListAsync();
         }
 
         [HttpGet("{id:int}")]
-        [Route("GetReader/{id:int}")]
         public async Task<ActionResult<Reader>> GetReader(int id)
         {
             return await _db.Readers.FirstAsync(p => p.ID == id);
         }
 
         [HttpPost]
-        [Route("AddReader")]
-        public async Task<ActionResult<Reader>> AddReader(Reader reader)
+        public async Task AddReader(Reader reader)
         {
+   
             await _db.Readers.AddAsync(reader);
             await _db.SaveChangesAsync();
-            return reader;
         }
 
-        [HttpPost]
-        [Route("EditReader")]
-        public async Task<ActionResult<Reader>> EditReader(Reader reader)
+        [HttpPut]
+        public async Task EditReader(Reader reader)
         {
             _db.Readers.Update(reader);
             await _db.SaveChangesAsync();
-            return reader;
         }
 
-        [HttpPost]
-        [Route("DeleteReader")]
-        public async Task<ActionResult<Reader>> DeleteReader(Reader reader)
+        [HttpDelete("{id:int}")]
+        public async Task DeleteReader(int id)
         {
-            _db.Readers.Remove(reader);
+            _db.Readers.Remove(await _db.Readers.FirstAsync(p => p.ID == id));
             await _db.SaveChangesAsync();
-            return reader;
         }
 
     }
