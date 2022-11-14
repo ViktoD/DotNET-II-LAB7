@@ -1,62 +1,119 @@
-@page "/deleteinfo/{id:int}"
+@page "/infobooks"
 @using lab7.Shared.Models
 @inject HttpClient httpClient
 
+<h1>Information about all books</h1>
 
-<h1>Delete information about book</h1>
-@if(_infoBook != null){
-<EditForm Model="_infoBook" OnSubmit="DeleteInfoBook" >
-	<label>Book ID</label>
-	<input value="@_infoBook.BookID" readonly />
-	<br/>
-	<label>Ticket ID</label>
-	<input value="@_infoBook.TicketID" readonly />
-	<br/>
-	<label>Date take book</label>
-	<input value="@_infoBook.DateTakeBook.ToString("d")" readonly />
-	<br/>
-	<label>Date return book</label>
-	@{
-		if(_infoBook.DateReturnBook == null)
-		{
-			<input value="Book is not returned" readonly />
-		}
-		else
-		{
-			<input value="@_infoBook.DateReturnBook" readonly />
-		}
-	}
-	<br/>
-	<button type="submit">Delete book</button>
-	</EditForm>
+<a href="/addinfo" class="btn btn-primary">Add new information about book</a>
+@if(infoBooks == null){
+    <h1>No information about books</h1>
 }
-else
-{
-	<h1>No information about book</h1>
+else{
+<table class="table table-bordered table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>
+                Surname reader
+            </th>
+            <th>
+                Name reader
+            </th>
+            <th>
+                Patronymic name reader
+            </th>
+            <th>
+                Address reader
+            </th>
+            <th>
+                Phone reader
+            </th>
+            <th>
+                Date birth reader
+            </th>
+            <th>
+                ID ticket
+            </th>
+            <th>
+                Name book
+            </th>
+            <th>
+                Author book
+            </th>
+            <th>
+                Price book
+            </th>
+            <th>
+                Date take book
+            </th>
+            <th>
+                Date return book
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var infoBook in infoBooks)
+        {
+            <tr>
+                <td>
+                    @infoBook.Ticket.Reader.Surname
+                </td>
+                <td>
+                   @infoBook.Ticket.Reader.Name
+                </td>
+                <td>
+                    @infoBook.Ticket.Reader.PatronymicName
+                </td>
+                <td>
+                   @infoBook.Ticket.Reader.Address
+                </td>
+                <td>
+                   @infoBook.Ticket.Reader.Phone
+                </td>
+                <td>
+                   @infoBook.Ticket.Reader.DateBirth.ToString("d")
+                </td>
+                <td>
+                    @infoBook.Ticket.ID
+                </td>
+                <td>
+                    @infoBook.Book.Name
+                </td>
+                <td>
+                   @infoBook.Book.Author
+                </td>
+                <td>
+                   @infoBook.Book.Price
+                </td>
+                <td>
+                    @infoBook.DateTakeBook.ToString("d")
+                </td>
+                @{
+                    if(infoBook.DateReturnBook == null)
+                    {
+                        <td>Book is not returned</td>
+                    }
+                    else
+                    {
+                        <td>@infoBook.DateReturnBook</td>
+                    }
+                }
+                <td>
+                    <a href="/deleteinfo/@infoBook.ID" class="btn btn-danger">Delete information about book</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 }
-	<button><a href="/infobooks">Return to all books</a></button>
 
 @code {
-	[Inject] NavigationManager navigationManager { get; set; } = null!;
-	[Parameter] public int id{ get; set; }
+	List<InfoBook>? infoBooks = null;
 
-	private InfoBook? _infoBook = null;
-
-	protected override async Task OnParametersSetAsync()
+	protected override async Task OnInitializedAsync()
 	{
-		if(id <= 0)
-		{
-			navigationManager.NavigateTo("/infobooks");
-		}
-		_infoBook = await httpClient.GetFromJsonAsync<InfoBook>($"api/InfoBook/{id}");
-
-	}
-
-	private async Task DeleteInfoBook()
-	{
-		if(_infoBook != null){
-			await httpClient.DeleteAsync($"api/InfoBook/{_infoBook.ID}");
-		}
-		navigationManager.NavigateTo("/infobooks");
+		infoBooks = await httpClient.GetFromJsonAsync<List<InfoBook>>("api/InfoBook/");
 	}
 }
