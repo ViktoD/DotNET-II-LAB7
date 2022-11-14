@@ -1,4 +1,4 @@
-﻿@page "/editbook/{id:int}"
+@page "/editbook/{id:int}"
 @using lab7.Shared.Models
 @inject HttpClient httpClient
 
@@ -12,6 +12,8 @@
 		<h1>Edit book</h1>
 	}
 }
+
+
 
 <EditForm Model="_book" OnValidSubmit="EditBook">
 	<label for="name">Name book</label>
@@ -37,8 +39,9 @@
 
 @code {
 	[Inject] NavigationManager navigationManager{ get; set; } = null!;
+	private Book? _book = new Book();
 	[Parameter] public int id { get; set; }
-	private Book _book = new Book();
+
 
 	protected override async Task OnParametersSetAsync()
 	{
@@ -57,11 +60,25 @@
 	{
 		if (id == 0)
 		{
-			await httpClient.PostAsJsonAsync<Book>("api/Book/AddBook", _book);
+			if(_book!= null)
+			{
+				await httpClient.PostAsJsonAsync<Book>("api/Book/", _book);
+			}
+			else
+			{
+				navigationManager.NavigateTo("/books");
+			}
 		}
 		else
 		{
-			await httpClient.PostAsJsonAsync<Book>("api/Book/EditBook", _book);
+			if (_book != null)
+			{
+				await httpClient.PutAsJsonAsync<Book>($"api/Book/", _book);
+			}
+			else
+			{
+				navigationManager.NavigateTo("/books");
+			}
 		}
 		navigationManager.NavigateTo("/books");
 	}
