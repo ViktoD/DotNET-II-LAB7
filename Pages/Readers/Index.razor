@@ -1,9 +1,14 @@
-﻿@page "/readers"
+@page "/readers"
 @using lab7.Shared.Models
 @inject HttpClient httpClient
 
 <h1>All readers</h1>
 <a href="/editreader/0" class="btn btn-primary">Add new reader</a>
+@if(readers == null)
+{
+    <h1>Readers not found</h1>
+}
+else{
 <table class="table table-bordered table-striped" style="width:100%">
     <thead>
         <tr>
@@ -69,13 +74,15 @@
         }
     </tbody>
 </table>
+}
+
 @code {
-    List<Reader> readers = new List<Reader>();
+    List<Reader>? readers = null;
    
 
 	protected override async Task OnInitializedAsync()
 	{
-		readers = await httpClient.GetFromJsonAsync<List<Reader>>("api/Reader/GetReaders");
+		readers = await httpClient.GetFromJsonAsync<List<Reader>>("api/Reader/");
 
 	}
 }
