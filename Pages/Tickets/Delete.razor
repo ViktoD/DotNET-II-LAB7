@@ -1,9 +1,12 @@
-﻿@page "/deleteticket/{id:int}"
+@page "/deleteticket/{id:int}"
 @using lab7.Shared.Models
 @inject HttpClient httpClient
 
 <h1>Delete ticket</h1>
-
+@if(_ticket == null){
+	<h1>Ticket not found</h1>
+}
+else{
 <EditForm Model="_ticket" OnSubmit="DeleteTicket">
 	<label>Reader id</label>
 	<input value="@_ticket.ReaderID" readonly />
@@ -15,14 +18,15 @@
 	<input value="@_ticket.DateEnd.ToString("d")" readonly />
 	<br/>
 	<button type="submit">Delete information about ticket</button>
-	<button><a href="/tickets">Return to all tickets</a></button>
 </EditForm>
+}
+<button><a href="/tickets">Return to all tickets</a></button>
 
 @code {
 	[Inject] NavigationManager navigationManager { get; set; } = null!;
 	[Parameter] public int id{ get; set; }
 
-	private Ticket _ticket = new Ticket();
+	private Ticket? _ticket = null;
 
 	protected override async Task OnParametersSetAsync()
 	{
@@ -35,7 +39,11 @@
 
 	private async Task DeleteTicket()
 	{
-		await httpClient.PostAsJsonAsync<Ticket>("api/Ticket/DeleteTicket", _ticket);
+		if (_ticket != null)
+		{
+			await httpClient.DeleteAsync($"api/Ticket/{_ticket.ID}");
+		}
+
 		navigationManager.NavigateTo("/tickets");
 	}
 }
