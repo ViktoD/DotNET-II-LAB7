@@ -17,6 +17,6 @@ namespace lab7.Shared.Models
 
         public DateTime DateEnd { get; set; }
       
-        public Reader? Reader { get; set; }
+        public Reader Reader { get; set; } = null!;
     }
 }
