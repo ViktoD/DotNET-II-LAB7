@@ -1,9 +1,13 @@
-﻿@page "/books"
+@page "/books"
 @using lab7.Shared.Models
 @inject HttpClient httpClient
 
 <h1>All books</h1>
 <a href="/editbook/0" class="btn btn-primary">Add new book</a>
+@if(books == null){
+    <h1>Books not found</h1>
+}
+else{
 <table class="table table-bordered table-striped" style="width:100%">
     <thead>
         <tr>
@@ -59,13 +63,13 @@
         }
     </tbody>
 </table>
-
+}
 @code {
-    List<Book> books = new List<Book>();
+    List<Book>? books = null;
 
 	protected override async Task OnInitializedAsync()
 	{
-		books = await httpClient.GetFromJsonAsync<List<Book>>("api/Book/GetBooks");
+		books = await httpClient.GetFromJsonAsync<List<Book>>("api/Book/");
 	}
 }
 
