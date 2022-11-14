@@ -1,4 +1,4 @@
-﻿using lab7.Server.Database;
+using lab7.Server.Database;
 using lab7.Shared.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +18,6 @@ namespace lab7.Server.Controllers
         }
 
         [HttpGet]
-        [Route("GetInfoBooks")]
         public async Task<ActionResult<List<InfoBook>>> GetInfoBooks()
         {
             return await _db.InfoBooks.Include(p => p.Ticket).Include(p => p.Book).Include(p => p.Ticket.Reader).OrderBy(p => p.Ticket.Reader.Surname).ToListAsync();
@@ -26,28 +25,33 @@ namespace lab7.Server.Controllers
 
 
         [HttpGet("{id:int}")]
-        [Route("GetInfoBook/{id:int}")]
         public async Task<ActionResult<InfoBook>> GetInfoBook(int id)
         {
             return await _db.InfoBooks.FirstAsync(p => p.ID == id);
         }
 
         [HttpPost]
-        [Route("AddInfoBook")]
-        public async Task<ActionResult<InfoBook>> AddInfoBook(InfoBook infoBook)
+        public async Task AddInfoBook(InfoBook infoBook)
         {
-            await _db.InfoBooks.AddAsync(infoBook);
-            await _db.SaveChangesAsync();
-            return infoBook;
+            Book? book = await _db.Books.FindAsync(infoBook.BookID);
+            Ticket? ticket = await _db.Tickets.FindAsync(infoBook.TicketID);
+            Reader? reader = await _db.Readers.FindAsync(infoBook.Ticket.ReaderID);
+            
+            if(book != null && ticket != null && reader != null)
+            {
+                infoBook.Book = book;
+                infoBook.Ticket = ticket;
+                infoBook.Ticket.Reader = reader;
+                await _db.InfoBooks.AddAsync(infoBook);
+                await _db.SaveChangesAsync();
+            }
         }
 
-        [HttpPost]
-        [Route("DeleteInfoBook")]
-        public async Task<ActionResult<InfoBook>> DeleteInfoBook(InfoBook infoBook)
+        [HttpDelete("{id:int}")]
+        public async Task DeleteInfoBook(int id)
         {
-            _db.InfoBooks.Remove(infoBook);
+            _db.InfoBooks.Remove(await _db.InfoBooks.FirstAsync(p => p.ID == id));
             await _db.SaveChangesAsync();
-            return infoBook;
         }
     }
 }
