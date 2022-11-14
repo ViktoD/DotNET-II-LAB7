@@ -1,11 +1,17 @@
-﻿@page "/tickets"
+@page "/tickets"
 @using lab7.Shared.Models
 @inject HttpClient httpClient
 
 <h1>All tickets</h1>
 
 <a href="/addticket" class="btn btn-primary">Add new ticket</a>
-<table class="table table-bordered table-striped" style="width:100%">
+    @if(tickets == null)
+    {
+      <h1>No tickets</h1>
+    }
+    else
+    {
+    <table class="table table-bordered table-striped" style="width:100%">
     <thead>
         <tr>
             <th>
@@ -58,15 +64,16 @@
                 </td>
             </tr>
         }
+      
     </tbody>
 </table>
-
+}
 
 @code {
-	List<Ticket> tickets = new List<Ticket>();
+	List<Ticket>? tickets = null;
 
 	protected override async Task OnInitializedAsync()
 	{
-		tickets = await httpClient.GetFromJsonAsync<List<Ticket>>("api/Ticket/GetTickets");
+		tickets = await httpClient.GetFromJsonAsync<List<Ticket>>("api/Ticket/");
 	}
 }
