@@ -1,6 +1,7 @@
-﻿@page "/editreader/{id:int}"
+@page "/editreader/{id:int}"
 @using lab7.Shared.Models
 @inject HttpClient httpClient
+
 
 @{
 	if(id == 0)
@@ -13,7 +14,7 @@
 	}
 }
 
-<EditForm Model="_reader" OnValidSubmit="EditReader">
+	<EditForm Model="_reader" OnValidSubmit="EditReader">
 	
 	<label for="surname">Surname</label>
 	<InputText @bind-Value="_reader.Surname" id="surname" />
@@ -36,14 +37,14 @@
 
 	<DataAnnotationsValidator />
 	<ValidationSummary />
-
 	<button type="submit">Save chnages</button>
-	<button><a href="/readers">Return to all readers</a></button>
-</EditForm>
+	
+	</EditForm>
+<button><a href="/readers">Return to all readers</a></button>
 
 @code {
 	[Inject] NavigationManager navigationManager{ get; set; } = null!;
-	private Reader _reader = new Reader();
+	private Reader? _reader = new Reader();
 	[Parameter] public int id { get; set; }
 
 	protected override async Task OnParametersSetAsync()
@@ -63,13 +64,12 @@
 	{
 		if (id == 0) 
 		{
-			await httpClient.PostAsJsonAsync<Reader>("api/Reader/AddReader",_reader);
+			await httpClient.PostAsJsonAsync("api/Reader/",_reader);
 		}
 		else 
 		{
-			await httpClient.PostAsJsonAsync<Reader>("api/Reader/EditReader", _reader);
+			await httpClient.PutAsJsonAsync($"api/Reader/", _reader);
 		}
-
 		navigationManager.NavigateTo("/readers"); 
 	}
 }
